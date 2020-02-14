@@ -1,9 +1,8 @@
+import os
+import sys
+
 import pygame
 import requests
-from io import BytesIO
-from PIL import Image
-import sys, os
-
 
 pygame.init()
 
@@ -26,7 +25,6 @@ try:
 except IOError as ex:
     print("Ошибка записи временного файла:", ex)
     sys.exit(2)
-
 
 screen = pygame.display.set_mode((600, 450))
 screen.blit(pygame.image.load(map_file), (0, 0))
