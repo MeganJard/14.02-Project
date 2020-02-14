@@ -54,7 +54,7 @@ while running:
                 if k < len(spm) - 1:
                     k += 1
             elif event.key == 280:
-                if k >= 0:
+                if k > 0:
                     k -= 1
                 
     clock.tick(FPS)
