@@ -1,9 +1,8 @@
+import os
+import sys
+
 import pygame
 import requests
-from io import BytesIO
-from PIL import Image
-import sys, os
-
 
 pygame.init()
 
@@ -27,8 +26,8 @@ except IOError as ex:
     print("Ошибка записи временного файла:", ex)
     sys.exit(2)
 
-
-spm = ['0.005 0.005', '0.01 0.01', '0.05 0.05', '0.1 0.1', '0.25 0.25', '0.5 0.5', '1 1', '2 2', '5 5', '10 10', '20 20', '30 30', '50 50']
+spm = ['0.005 0.005', '0.01 0.01', '0.05 0.05', '0.1 0.1', '0.25 0.25', '0.5 0.5', '1 1', '2 2',
+       '5 5', '10 10', '20 20', '30 30', '50 50']
 k = 0
 screen = pygame.display.set_mode((600, 450))
 pygame.display.flip()
@@ -56,7 +55,7 @@ while running:
             elif event.key == 280:
                 if k > 0:
                     k -= 1
-                
+
     clock.tick(FPS)
 
 os.remove(map_file)
