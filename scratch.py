@@ -4,8 +4,8 @@ from io import BytesIO
 from PIL import Image
 import sys, os
 
-pygame.init()
 
+pygame.init()
 
 
 def get_pic(coords='39 52', spn='0.005 0.005'):
@@ -19,13 +19,6 @@ def get_pic(coords='39 52', spn='0.005 0.005'):
     return response
 
 
-
-class Paint(pygame.sprite.Sprite):
-    def __init__(self, image, location):
-        pygame.sprite.Sprite.__init__(self)
-        self.image = image
-
-
 map_file = "map.png"
 try:
     with open(map_file, "wb") as file:
@@ -35,21 +28,12 @@ except IOError as ex:
     sys.exit(2)
 
 
-    # Инициализируем pygame
-pygame.init()
 screen = pygame.display.set_mode((600, 450))
-# Рисуем картинку, загружаемую из только что созданного файла.
 screen.blit(pygame.image.load(map_file), (0, 0))
-# Переключаем экран и ждем закрытия окна.
 pygame.display.flip()
 while pygame.event.wait().type != pygame.QUIT:
     pass
-
-pygame.quit()
-    # Удаляем за собой файл с изображением.
 os.remove(map_file)
-
-
 FPS = 50
 screen = pygame.display.set_mode((500, 500))
 screen.fill((0, 0, 0))
@@ -66,8 +50,4 @@ while running:
 
     screen.blit(img, (0, 0))
     clock.tick(30)
-
 pygame.quit()
-#что то добавил
-# изменен ВС
-
