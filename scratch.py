@@ -1,4 +1,9 @@
 import requests
+import pygame
+
+
+pygame.init()
+
 
 def get_pic(geocode='Москва, Кремль', spn='0.005, 0.005'):
 
@@ -26,3 +31,32 @@ def get_pic(geocode='Москва, Кремль', spn='0.005, 0.005'):
 
     response = requests.get(picserver, params=picparams).content
     return response
+
+
+class Paint(pygame.sprite.Sprite):
+    def __init__(self, image, location):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = image
+        self.rect = self.image.get_rect()
+        self.rect.left, self.rect.top = location
+
+
+FPS = 50
+screen = pygame.display.set_mode((500, 500))
+screen.fill((0, 0, 0))
+pygame.display.flip()
+running = True
+clock = pygame.time.Clock()
+
+while running:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+            break
+    pygame.display.flip()
+    p = Paint(get_pic(), [0, 0])
+    screen.blit(p.image, p.rect)
+    clock.tick(30)
+
+
+pygame.quit()
