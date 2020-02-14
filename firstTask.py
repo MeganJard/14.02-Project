@@ -31,16 +31,10 @@ except IOError as ex:
 screen = pygame.display.set_mode((600, 450))
 screen.blit(pygame.image.load(map_file), (0, 0))
 pygame.display.flip()
-while pygame.event.wait().type != pygame.QUIT:
-    pass
-os.remove(map_file)
 FPS = 50
-screen = pygame.display.set_mode((500, 500))
-screen.fill((0, 0, 0))
-pygame.display.flip()
 running = True
 clock = pygame.time.Clock()
-img = pygame.image.load('map.img')
+img = pygame.image.load(map_file)
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -49,5 +43,7 @@ while running:
     pygame.display.flip()
 
     screen.blit(img, (0, 0))
-    clock.tick(30)
+    clock.tick(FPS)
+
+os.remove(map_file)
 pygame.quit()
