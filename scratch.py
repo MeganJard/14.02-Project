@@ -64,4 +64,5 @@ while running:
     clock.tick(30)
 
 pygame.quit()
+#что то добавил
 # изменен ВС
