@@ -2,8 +2,8 @@ import requests
 
 def get_pic(geocode='Москва, Кремль', spn='0.005, 0.005'):
 
-    geocode = input('Введите адрес')
-    spn = input('Введите масштаб')
+    geocode = geocode
+    spn = spn
 
     geoserver = 'https://geocode-maps.yandex.ru/1.x/'
 
