@@ -3,26 +3,28 @@ import requests
 from io import BytesIO
 from PIL import Image
 import sys, os
+
 pygame.init()
+
 
 
 def get_pic(coords='39 52', spn='0.005 0.005'):
     picserver = 'https://static-maps.yandex.ru/1.x/'
-
     picparams = {
         'l': 'map',
         'll': ','.join(coords.split()),
         'spn': ','.join(spn.split())
     }
-
     response = requests.get(picserver, params=picparams).content
     return response
+
 
 
 class Paint(pygame.sprite.Sprite):
     def __init__(self, image, location):
         pygame.sprite.Sprite.__init__(self)
         self.image = image
+
 
 map_file = "map.png"
 try:
@@ -31,6 +33,7 @@ try:
 except IOError as ex:
     print("Ошибка записи временного файла:", ex)
     sys.exit(2)
+
 
     # Инициализируем pygame
 pygame.init()
@@ -45,6 +48,7 @@ while pygame.event.wait().type != pygame.QUIT:
 pygame.quit()
     # Удаляем за собой файл с изображением.
 os.remove(map_file)
+
 
 FPS = 50
 screen = pygame.display.set_mode((500, 500))
@@ -66,3 +70,4 @@ while running:
 pygame.quit()
 #что то добавил
 # изменен ВС
+
