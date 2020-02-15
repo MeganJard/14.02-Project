@@ -10,6 +10,18 @@ COLOR_INACTIVE = (50, 50, 50)
 COLOR_ACTIVE = (255, 204, 0)
 FONT = pygame.font.Font(None, 32)
 
+def after_get():
+    try:
+        with open(map_file, "wb") as file:
+            try:
+                file.write(get_pic(spn=spm[k], l=l[Buttons.index(True)],
+                                   coords=' '.join([str(i) for i in [first_c, sec_c]]), pt=pt))
+            except ValueError:
+                file.write(get_pic(spn=spm[k],
+                                   coords=' '.join([str(i) for i in [first_c, sec_c]])))
+    except IOError as ex:
+        print("Ошибка записи временного файла:", ex)
+        sys.exit(2)
 
 class InputBox:
     def __init__(self, x, y, w, h, text=''):
@@ -21,9 +33,13 @@ class InputBox:
         self.text = text
         self.txt_surface = FONT.render(text, True, self.color)
         self.active = False
+        self.deleteButton = pygame.image.load('data/deleteButton.png')
+        self.hoveredDeleteButton = pygame.image.load('data/hoverdeleteButton.png')
+        self.hovercross = False
 
     def txt(self):
         txt = self.text
+
         self.text = ''
         return txt
 
@@ -31,6 +47,10 @@ class InputBox:
         if event.type == pygame.MOUSEBUTTONDOWN:
             if self.rect.collidepoint(event.pos):
                 self.active = not self.active
+                if self.text == 'error':
+                    self.text = ''
+                    self.txt_surface = FONT.render(self.text, True, self.color)
+                    self.draw(screen)
             else:
                 self.active = False
             self.color = COLOR_ACTIVE if self.active else COLOR_INACTIVE
@@ -41,7 +61,7 @@ class InputBox:
                 else:
                     self.text += event.unicode if (
                                                           event.unicode != '\r' and event.unicode != '\x1b') and len(
-                        self.text) + 1 <= 35 else ''
+                        self.text) + 1 <= 30 else ''
                 self.txt_surface = FONT.render(self.text, True, self.color)
 
     def update(self):
@@ -55,12 +75,20 @@ class InputBox:
         pygame.draw.rect(screen, self.color, self.rect, 2)
         screen.blit(self.txt_surface, (self.rect.x + 5, self.rect.y + 10))
         screen.blit(self.searchImg, (self.rect.x + self.rect.w + 5, self.rect.y - 4))
+        if self.hovercross:
+            screen.blit(pygame.transform.scale(self.hoveredDeleteButton, (45, 45)),
+                        (self.rect.x + self.rect.w + 55, self.rect.y - 4))
+        else:
+            screen.blit(pygame.transform.scale(self.deleteButton, (45, 45)), (self.rect.x + self.rect.w + 55, self.rect.y - 4))
 
     def hover_on_search(self, m_pos):
         if self.searchImg.get_rect(x=self.rect.x + self.rect.w + 5, y=self.rect.y).collidepoint(
                 m_pos):
             return True
-
+    def hover_on_square(self, m_pos):
+        if self.searchImg.get_rect(x=self.rect.x + self.rect.w + 55, y=self.rect.y - 4).collidepoint(
+                m_pos):
+            return True
 
 def get_pic(coords='39 52', spn='0.005 0.005', l='map', pt=''):
     picserver = 'https://static-maps.yandex.ru/1.x/'
@@ -98,7 +126,7 @@ spm = ['0.001 0.001', '0.003 0.003', '0.005 0.005', '0.01 0.01', '0.05 0.05', '0
 k = 0
 screen = pygame.display.set_mode((600, 450))
 pygame.display.flip()
-FPS = 40
+FPS = 30
 running = True
 clock = pygame.time.Clock()
 img = pygame.image.load(map_file)
@@ -109,21 +137,12 @@ Buttons = [True, False, False]
 normalButton = pygame.transform.scale(pygame.image.load('data/normalButton.png'), (25, 25))
 clickedButton = pygame.transform.scale(pygame.image.load('data/clickedButton.png'), (25, 25))
 
+
 l = ['map', 'sat', 'sat,skl']
 eventy_pos = []
 pt = ''
 while running:
-    try:
-        with open(map_file, "wb") as file:
-            try:
-                file.write(get_pic(spn=spm[k], l=l[Buttons.index(True)],
-                                   coords=' '.join([str(i) for i in [first_c, sec_c]]), pt=pt))
-            except ValueError:
-                file.write(get_pic(spn=spm[k],
-                                   coords=' '.join([str(i) for i in [first_c, sec_c]])))
-    except IOError as ex:
-        print("Ошибка записи временного файла:", ex)
-        sys.exit(2)
+
     screen.blit(pygame.image.load(map_file), (0, 0))
 
     for event in pygame.event.get():
@@ -136,24 +155,34 @@ while running:
             if event.key == 281:
                 if k < len(spm) - 1:
                     k += 1
+                    after_get()
             elif event.key == 280:
                 if k > 0:
                     k -= 1
+                    after_get()
             elif event.key == pygame.K_UP:
                 sec_c += (float(spm[k].split()[1]))
+                after_get()
             elif event.key == pygame.K_DOWN:
                 sec_c -= (float(spm[k].split()[1]))
+                after_get()
             elif event.key == pygame.K_RIGHT:
                 first_c += (float(spm[k].split()[0]))
+                after_get()
             elif event.key == pygame.K_LEFT:
                 first_c -= (float(spm[k].split()[0]))
+                after_get()
             if first_c >= 180:
                 first_c -= 359
+                after_get()
             elif first_c <= - 180:
                 first_c += 359
+                after_get()
             if sec_c >= 86:
                 sec_c -= 171
+                after_get()
             elif sec_c <= -86:
+                after_get()
                 sec_c += 171
 
         if event.type == pygame.MOUSEBUTTONDOWN:
@@ -164,6 +193,10 @@ while running:
             elif clickedButton.get_rect(x=550, y=20).collidepoint(event.pos):
                 Buttons = [False, False, True]
             elif find.hover_on_search(event.pos):
+                if find.text == 'error':
+                    find.text = ''
+                    find.txt_surface = FONT.render(find.text, True, find.color)
+                    continue
                 server = 'https://geocode-maps.yandex.ru/1.x'
                 params = {
                     'apikey': '40d1649f-0493-4b70-98ba-98533de7710b',
@@ -172,7 +205,7 @@ while running:
                 }
                 response = requests.get(server, params=params)
 
-                if response:
+                try:
                     first_c, sec_c = response.json()["response"]["GeoObjectCollectio"
                                                                  "n"]["featureMember"][0][
                         "GeoObject"][
@@ -180,19 +213,30 @@ while running:
                                  's'].split()
                     first_c, sec_c = float(first_c), float(sec_c)
                     pt = ','.join([str(i) for i in [first_c, sec_c]])
-                else:
-                    find.text = ''
+                except Exception:
+                    find.text = 'error'
+                    find.txt_surface = FONT.render(find.text, True, (220, 20, 32))
+            elif find.hover_on_square(event.pos):
+                find.text = ''
+                pt = ''
+                find.txt_surface = FONT.render(find.text, True, find.color)
 
+            after_get()
         if event.type == pygame.MOUSEMOTION:
             eventy_pos = list(event.pos)
+
     if find.hover_on_search(eventy_pos):
         pygame.draw.rect(screen, (200, 200, 200),
                          find.searchImg.get_rect(x=find.rect.x + find.rect.w + 5,
                                                  y=find.rect.y - 7))
+    elif find.hover_on_square(eventy_pos):
+        find.hovercross = True
 
     find.draw(screen)
     draw_buttons()
+
     find.update()
+    find.hovercross = False
     pygame.display.flip()
     clock.tick(FPS)
 
