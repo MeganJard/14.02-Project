@@ -275,7 +275,7 @@ while running:
                         line = txt_adr[80 * i: 80 * (i + 1)]
                         sur = SFONT.render(line, True, adress.color)
                         adress.text_li.append(
-                            [sur, (adress.rect.x + 5, adress.rect.y + 2 + 7 * i)])
+                            [sur, (adress.rect.x + 5, adress.rect.y + 2 + 9 * i)])
 
                 except Exception:
                     find.text = 'error'
