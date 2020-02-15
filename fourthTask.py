@@ -97,6 +97,7 @@ while running:
                 Buttons = [False, True, False]
             elif clickedButton.get_rect(x=550, y=400).collidepoint(event.pos):
                 Buttons = [False, False, True]
+
     draw_buttons()
     pygame.display.flip()
     clock.tick(FPS)
