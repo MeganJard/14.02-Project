@@ -10,7 +10,7 @@ COLOR_INACTIVE = (50, 50, 50)
 COLOR_ACTIVE = (255, 204, 0)
 FONT = pygame.font.Font(None, 32)
 
-
+#
 class InputBox:
     def __init__(self, x, y, w, h, text=''):
         self.min_w = w
