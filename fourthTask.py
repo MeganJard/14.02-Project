@@ -6,7 +6,6 @@ import requests
 
 pygame.init()
 
-
 def draw_buttons():
     for i in range(3):
         if Buttons[i]:
@@ -38,8 +37,8 @@ spm = ['0.005 0.005', '0.01 0.01', '0.05 0.05', '0.1 0.1', '0.25 0.25', '0.5 0.5
        '5 5', '10 10', '20 20', '30 30', '50 50']
 
 Buttons = [False, False, False]
-normalButton = pygame.transform.scale(pygame.image.load('normalButton.png'), (25, 25))
-clickedButton = pygame.transform.scale(pygame.image.load('clickedButton.png'), (25, 25))
+normalButton = pygame.transform.scale(pygame.image.load('data/normalButton.png'), (25, 25))
+clickedButton = pygame.transform.scale(pygame.image.load('data/clickedButton.png'), (25, 25))
 
 k = 0
 screen = pygame.display.set_mode((600, 450))
