@@ -110,7 +110,7 @@ class InputBoxforadress(InputBox):
         super().__init__(x, y, w, h, text, search_flag, crossy_flag)
 
     def update(self):
-        print(self.text_li)
+
         if self.text_li != []:
             width = max(self.min_w, max([i[0].get_width() for i in self.text_li]) + 10)
         else:
@@ -270,7 +270,7 @@ while running:
                         'GeocoderMetaData']['text']
 
                     n = len(txt_adr) // 80 + 1 if len(txt_adr) % 80 != 0 else len(txt_adr) // 80
-                    print(n)
+
                     for i in range(n):
                         line = txt_adr[80 * i: 80 * (i + 1)]
                         sur = SFONT.render(line, True, adress.color)
