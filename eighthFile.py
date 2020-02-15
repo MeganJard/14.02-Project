@@ -9,6 +9,9 @@ pygame.init()
 COLOR_INACTIVE = (50, 50, 50)
 COLOR_ACTIVE = (255, 204, 0)
 FONT = pygame.font.Font(None, 32)
+SFONT = pygame.font.Font(None, 15)
+buttonBar = pygame.image.load('data/ButtonBar.png')
+
 
 def after_get():
     try:
@@ -23,12 +26,17 @@ def after_get():
         print("Ошибка записи временного файла:", ex)
         sys.exit(2)
 
+
 class InputBox:
-    def __init__(self, x, y, w, h, text=''):
+    def __init__(self, x, y, w, h, text='', search_flag=True, crossy_flag=True):
+        self.text_li = []
         self.min_w = w
+        self.search_flag = search_flag
+        self.crossy_flag = crossy_flag
         self.rect = pygame.Rect(x, y, w, h)
         self.rect2 = pygame.Rect(x + 2, y + 2, w - 2, h - 3)
         self.searchImg = pygame.image.load('data/searchButton.png')
+        self.hoveredsearchImg = pygame.image.load('data/hoveredsearchButton.png')
         self.color = COLOR_INACTIVE
         self.text = text
         self.txt_surface = FONT.render(text, True, self.color)
@@ -74,21 +82,62 @@ class InputBox:
         pygame.draw.rect(screen, (150, 150, 150), self.rect2)
         pygame.draw.rect(screen, self.color, self.rect, 2)
         screen.blit(self.txt_surface, (self.rect.x + 5, self.rect.y + 10))
-        screen.blit(self.searchImg, (self.rect.x + self.rect.w + 5, self.rect.y - 4))
+        if self.hover_on_search(eventy_pos):
+            screen.blit(self.hoveredsearchImg, (self.rect.x + self.rect.w + 5, self.rect.y - 4))
+        else:
+            screen.blit(self.searchImg, (self.rect.x + self.rect.w + 5, self.rect.y - 4))
         if self.hovercross:
             screen.blit(pygame.transform.scale(self.hoveredDeleteButton, (45, 45)),
                         (self.rect.x + self.rect.w + 55, self.rect.y - 4))
         else:
-            screen.blit(pygame.transform.scale(self.deleteButton, (45, 45)), (self.rect.x + self.rect.w + 55, self.rect.y - 4))
+            screen.blit(pygame.transform.scale(self.deleteButton, (45, 45)),
+                        (self.rect.x + self.rect.w + 55, self.rect.y - 4))
 
     def hover_on_search(self, m_pos):
         if self.searchImg.get_rect(x=self.rect.x + self.rect.w + 5, y=self.rect.y).collidepoint(
                 m_pos):
             return True
+
     def hover_on_square(self, m_pos):
-        if self.searchImg.get_rect(x=self.rect.x + self.rect.w + 55, y=self.rect.y - 4).collidepoint(
-                m_pos):
+        if self.searchImg.get_rect(x=self.rect.x + self.rect.w + 55,
+                                   y=self.rect.y - 4).collidepoint(
+            m_pos):
             return True
+
+
+class InputBoxforadress(InputBox):
+    def __init__(self, x, y, w, h, text='', search_flag=True, crossy_flag=True):
+        super().__init__(x, y, w, h, text, search_flag, crossy_flag)
+
+    def update(self):
+        print(self.text_li)
+        if self.text_li != []:
+            width = max(self.min_w, max([i[0].get_width() for i in self.text_li]) + 10)
+        else:
+            width = self.min_w
+        self.rect.w = width
+        self.rect2.w = width - 2
+
+    def draw(self, screen):
+        self.update()
+        pygame.draw.rect(screen, (150, 150, 150), self.rect2)
+        pygame.draw.rect(screen, self.color, self.rect, 2)
+        if self.text_li != []:
+            for i in range(len(self.text_li)):
+                screen.blit(self.text_li[i][0], self.text_li[i][1])
+        if self.search_flag:
+            if self.hover_on_search(eventy_pos):
+                screen.blit(self.hoveredsearchImg, (self.rect.x + self.rect.w + 5, self.rect.y - 4))
+            else:
+                screen.blit(self.searchImg, (self.rect.x + self.rect.w + 5, self.rect.y - 4))
+        if self.crossy_flag:
+            if self.hovercross:
+                screen.blit(pygame.transform.scale(self.hoveredDeleteButton, (45, 45)),
+                            (self.rect.x + self.rect.w + 55, self.rect.y - 4))
+            else:
+                screen.blit(pygame.transform.scale(self.deleteButton, (45, 45)),
+                            (self.rect.x + self.rect.w + 55, self.rect.y - 4))
+
 
 def get_pic(coords='39 52', spn='0.005 0.005', l='map', pt=''):
     picserver = 'https://static-maps.yandex.ru/1.x/'
@@ -104,6 +153,7 @@ def get_pic(coords='39 52', spn='0.005 0.005', l='map', pt=''):
 
 
 def draw_buttons():
+    screen.blit(buttonBar, (495, 18))
     for i in range(3):
         if Buttons[i]:
             screen.blit(clickedButton, (500 + 25 * i, 20))
@@ -132,11 +182,11 @@ clock = pygame.time.Clock()
 img = pygame.image.load(map_file)
 first_c, sec_c = 39, 52
 find = InputBox(10, 400, 300, 40)
-
+adress = InputBoxforadress(10, 350, 300, 35, search_flag=False, crossy_flag=False)
+adress.txt_surface = SFONT.render('no adress', True, adress.color)
 Buttons = [True, False, False]
 normalButton = pygame.transform.scale(pygame.image.load('data/normalButton.png'), (25, 25))
 clickedButton = pygame.transform.scale(pygame.image.load('data/clickedButton.png'), (25, 25))
-
 
 l = ['map', 'sat', 'sat,skl']
 eventy_pos = []
@@ -213,25 +263,37 @@ while running:
                                  's'].split()
                     first_c, sec_c = float(first_c), float(sec_c)
                     pt = ','.join([str(i) for i in [first_c, sec_c]])
+                    txt_adr = response.json()["response"]["GeoObjectCollection"]["featureMemb"
+                                                                                 "er"][0][
+                        "GeoObject"]['metaDa'
+                                     'taProperty'][
+                        'GeocoderMetaData']['text']
+
+                    n = len(txt_adr) // 80 + 1 if len(txt_adr) % 80 != 0 else len(txt_adr) // 80
+                    print(n)
+                    for i in range(n):
+                        line = txt_adr[80 * i: 80 * (i + 1)]
+                        sur = SFONT.render(line, True, adress.color)
+                        adress.text_li.append(
+                            [sur, (adress.rect.x + 5, adress.rect.y + 2 + 7 * i)])
+
                 except Exception:
                     find.text = 'error'
                     find.txt_surface = FONT.render(find.text, True, (220, 20, 32))
             elif find.hover_on_square(event.pos):
                 find.text = ''
                 pt = ''
+                adress.text_li = []
                 find.txt_surface = FONT.render(find.text, True, find.color)
 
             after_get()
         if event.type == pygame.MOUSEMOTION:
             eventy_pos = list(event.pos)
 
-    if find.hover_on_search(eventy_pos):
-        pygame.draw.rect(screen, (200, 200, 200),
-                         find.searchImg.get_rect(x=find.rect.x + find.rect.w + 5,
-                                                 y=find.rect.y - 7))
-    elif find.hover_on_square(eventy_pos):
+    if find.hover_on_square(eventy_pos):
         find.hovercross = True
 
+    adress.draw(screen)
     find.draw(screen)
     draw_buttons()
 
