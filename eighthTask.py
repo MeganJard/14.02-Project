@@ -270,7 +270,7 @@ while running:
                         'GeocoderMetaData']['text']
 
                     n = len(txt_adr) // 80 + 1 if len(txt_adr) % 80 != 0 else len(txt_adr) // 80
-
+                    adress.text_li = []
                     for i in range(n):
                         line = txt_adr[80 * i: 80 * (i + 1)]
                         sur = SFONT.render(line, True, adress.color)
